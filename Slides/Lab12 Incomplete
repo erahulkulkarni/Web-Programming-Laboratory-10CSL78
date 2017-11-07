@@ -1,0 +1,118 @@
+
+ mysql -u root
+ or
+ mysql -u root -p 
+
+ create database lab12_development;
+ create database lab12_test;
+ create database lab12_production;
+
+ drop database lab12_development;
+ drop database lab12_test;
+ drop database lab12_production;
+ 
+ use lab12_development;
+
+ create table books
+  ( id int not null,
+    title varchar(32) not null,
+    author varchar(64) not null,
+    edition int not null,
+    publisher varchar(32) not null,
+    primary key(id)
+  );
+  
+   create table books
+  ( id int not null auto_increment,
+    title varchar(32) not null,
+    author varchar(64) not null,
+    edition int not null,
+    publisher varchar(32) not null,
+    primary key(id)
+  );
+
+ exit;
+
+ rails -d mysql lab12
+  
+ cd lab12
+
+ ruby script/generate scaffold Book id:integer title:string author:string edition:integer publisher:string
+ 
+ ruby script/server
+ 
+ http://localhost:3000/books
+ 
+ Control+C
+ 
+ welcome.rhtml and result.rhtml , save in lab12\app\view\main
+ 
+ welcome.rhtml
+  <html>
+   <title>Books</title>
+   <body>
+    <p> Total number of books=<%=@num_books%>
+    </p>
+    <form action="result">
+     Enter the title of book to search:
+     <input type="text" name="booktitle"/>
+     <input type="submit" value="Search"/>
+    </form>
+   </body>
+  </html>
+ 
+ 
+ result.rhtml
+  <html>
+   <title>Book search result</title>
+   <body>
+    <h1> Search result for book title "<%= @booktitle %>"    
+    </h1>
+    <form>
+     <table border=1>
+      <tr>
+       <th>Accession Number</th> <th>Title</th>
+       <th>Author</th> <th>Edition</th>
+       <th>Publisher</th>
+      </tr>
+
+      <% @books.each do |book|
+         @id=book.id
+         @title=book.title
+         @author=book.author
+         @edition=book.edition
+         @publisher=book.publisher   %>
+
+         <tr>
+          <td> <%= @id  %> </td>
+          <td> <%= @title %> </td>
+          <td> <%= @author  %> </td>
+          <td> <%= @edition %> </td>
+          <td> <%= @publisher %> </td>
+         </tr>
+
+      <% end %>
+
+     </table>
+    </form>
+   </body>
+  </html>
+
+ ruby script/generate controller main
+ 
+ main_controller.rb in lab12\app\controllers, save as
+  class MainController < ApplicationController
+     def welcome
+       @num_books=Book.count
+     end
+
+     def result
+       @booktitle=params[:booktitle]
+       @books=Book.find(:all,:conditions=>["title=?",@booktitle])
+    end
+  end
+
+ ruby script/server
+ 
+ http://localhost:3000/main/welcome
+ 
